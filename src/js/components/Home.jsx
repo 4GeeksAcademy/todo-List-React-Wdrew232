@@ -60,7 +60,18 @@ const Home = () => {
             onChange={(e) => setInput(e.target.value)}
             placeholder="Add a new task"
           />
-          <button onClick={AddItem}>Add +</button>
+          <button
+              onClick={() => {
+                const todoObject = {
+                  label: input,
+                  is_done: true
+                };
+                addTodo(todoObject); 
+                AddItem(); 
+              }}
+            >
+              Add +
+          </button>
         </div>
         <div className="List">
           {items.length === 0 ? (

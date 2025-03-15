@@ -20,13 +20,29 @@ const Home = () => {
     setItems(newItems);
   };
   
-  const todosUrl = "https://playground.4geeks.com/todo/users/Wdrew232";
+  const todosUrl = "https://playground.4geeks.com/todo/";
   const getTodos = ()=> {
-	fetch(todosUrl)
+	fetch(todosUrl + "users/idm")
 	.then((resp)=> resp.json())
 	.then((data)=> setItems(data.todos));
   }
   getTodos();
+
+  const addTodo = (input)=> {
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      }, 
+      body: JSON.stringify(input),
+    }
+      fetch(todosUrl + "todos/Wdrew232", options)
+      .then((resp)=> resp.json())
+
+      .then((data)=> console.log(data,"item added"))
+
+  }
+    
 
   useEffect(()=>{
 	if (items.length == 0 )

@@ -1,53 +1,51 @@
-import { useEffect } from "react";
-import React, { useState } from "react";
-// Include images into your bundle
-import rigoImage from "../../img/rigo-baby.jpg";
+import React, { useState, useEffect } from "react";
 
-// Create your first component
 const Home = () => {
   const [items, setItems] = useState([]);
   const [input, setInput] = useState("");
 
-  const AddItem = () => {
-    if (input.trim() !== "") {
-      setItems([items, input]);
-      setInput("");
-    }
-  };
-
-  const DeleteItem = (index) => {
-    const newItems = items.filter((_, i) => i !== index);
-    setItems(newItems);
-  };
-  
   const todosUrl = "https://playground.4geeks.com/todo/";
-  const getTodos = ()=> {
-	fetch(todosUrl + "users/idm")
-	.then((resp)=> resp.json())
-	.then((data)=> setItems(data.todos));
-  }
-  getTodos();
 
-  const addTodo = (input)=> {
+  const getTodos = () => {
+    fetch(`${todosUrl}users/idm`)
+      .then((resp) => resp.json())
+      .then((data) => setItems(data.todos || []));
+  };
+
+  const addTodo = (todoObject) => {
     const options = {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
-      }, 
-      body: JSON.stringify(input),
-    }
-      fetch(todosUrl + "todos/Wdrew232", options)
-      .then((resp)=> resp.json())
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(todoObject),
+    };
 
-      .then((data)=> console.log(data,"item added"))
+    fetch(`${todosUrl}todos/Wdrew232`, options)
+      .then((resp) => resp.json())
+      .then((data) => {
+        console.log(data, "item added");
+        setItems([...items, todoObject]); 
+      });
+  };
 
-  }
-    
+  const deleteTodo = (index) => {
+    const itemToDelete = items[index];
+    const options = {
+      method: "DELETE",
+    };
 
-  useEffect(()=>{
-	if (items.length == 0 )
-	getTodos();
-  },[])
+    fetch(`${todosUrl}todos/${itemToDelete.id}`, options)
+      .then((resp) => resp.json())
+      .then(() => {
+        const newItems = items.filter((_, i) => i !== index);
+        setItems(newItems);
+      });
+  };
+
+  useEffect(() => {
+    if (items.length === 0) getTodos();
+  }, []);
 
   return (
     <div className="text-center">
@@ -61,16 +59,16 @@ const Home = () => {
             placeholder="Add a new task"
           />
           <button
-              onClick={() => {
-                const todoObject = {
-                  label: input,
-                  is_done: true
-                };
-                addTodo(todoObject); 
-                AddItem(); 
-              }}
-            >
-              Add +
+            onClick={() => {
+              const todoObject = {
+                label: input,
+                is_done: false,
+              };
+              addTodo(todoObject);
+              setInput(""); 
+            }}
+          >
+            Add +
           </button>
         </div>
         <div className="List">
@@ -81,7 +79,7 @@ const Home = () => {
               {items.map((item, index) => (
                 <li key={index} className="todo-item">
                   {item.label}
-                  <button className="delete-btn" onClick={() => DeleteItem(index)}>
+                  <button className="delete-btn" onClick={() => deleteTodo(index)}>
                     X
                   </button>
                 </li>
